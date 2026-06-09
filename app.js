@@ -31,19 +31,26 @@ const editName = document.getElementById('edit-name');
 const editAmount = document.getElementById('edit-amount');
 const editCategory = document.getElementById('edit-category');
 const cancelEdit = document.getElementById('cancel-edit');
-const monthPrev = document.getElementById('month-prev');
-const monthNext = document.getElementById('month-next');
-const monthToday = document.getElementById('month-today');
-const monthName = document.getElementById('month-name');
-const monthYear = document.getElementById('month-year');
-const monthTotalAmount = document.getElementById('month-total-amount');
-const monthBadge = document.getElementById('month-badge');
+const periodTabs = document.getElementById('period-tabs');
+const periodPrev = document.getElementById('period-prev');
+const periodNext = document.getElementById('period-next');
+const periodToday = document.getElementById('period-today');
+const periodLabel = document.getElementById('period-label');
+const periodNav = document.getElementById('period-nav');
+const periodCustom = document.getElementById('period-custom');
+const periodStart = document.getElementById('period-start');
+const periodEnd = document.getElementById('period-end');
+const periodTotalAmount = document.getElementById('period-total-amount');
+const periodTotalLabel = document.getElementById('period-total-label');
+const periodBadge = document.getElementById('period-badge');
 
 let expenses = [];
 let editingIndex = null;
 let activeFilter = null;
-let activeMonth = null;
-let activeYear = null;
+let activePeriod = 'month';
+let activeDate = new Date();
+let customStart = '';
+let customEnd = '';
 
 function loadExpenses() {
   try {
@@ -92,44 +99,97 @@ function formatDate(dateStr) {
   return days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()] + ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 }
 
-function getMonthTotal(month, year) {
-  const m = String(month + 1).padStart(2, '0');
-  const prefix = year + '-' + m;
-  return expenses
-    .filter(function (e) { return e.date.slice(0, 7) === prefix; })
-    .reduce(function (sum, e) { return sum + Number(e.amount); }, 0);
+function getPeriodRange() {
+  const d = new Date(activeDate);
+  let start, end, label;
+
+  switch (activePeriod) {
+    case 'week': {
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+      start = new Date(d.getFullYear(), d.getMonth(), diff);
+      start.setHours(0, 0, 0, 0);
+      end = new Date(start);
+      end.setDate(end.getDate() + 7);
+      label = 'Week of ' + start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+      break;
+    }
+    case 'month': {
+      start = new Date(d.getFullYear(), d.getMonth(), 1);
+      end = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+      label = MONTHS[d.getMonth()] + ' ' + d.getFullYear();
+      break;
+    }
+    case 'quarter': {
+      const q = Math.floor(d.getMonth() / 3);
+      start = new Date(d.getFullYear(), q * 3, 1);
+      end = new Date(d.getFullYear(), (q + 1) * 3, 1);
+      label = 'Q' + (q + 1) + ' ' + d.getFullYear();
+      break;
+    }
+    case 'year': {
+      start = new Date(d.getFullYear(), 0, 1);
+      end = new Date(d.getFullYear() + 1, 0, 1);
+      label = String(d.getFullYear());
+      break;
+    }
+    case 'custom': {
+      if (customStart && customEnd) {
+        start = new Date(customStart + 'T00:00:00');
+        end = new Date(customEnd + 'T00:00:00');
+        end.setDate(end.getDate() + 1);
+        label = customStart + ' to ' + customEnd;
+      } else {
+        start = null;
+        end = null;
+        label = 'Custom Range';
+      }
+      break;
+    }
+    default:
+      start = null;
+      end = null;
+      label = 'All Time';
+  }
+
+  return { start: start, end: end, label: label };
 }
 
-function getMonthExpenses(month, year) {
-  const m = String(month + 1).padStart(2, '0');
-  const prefix = year + '-' + m;
+function getExpensesInPeriod() {
+  if (activePeriod === 'all') return [...expenses];
+  const range = getPeriodRange();
+  if (!range.start && !range.end) return [...expenses];
   return expenses.filter(function (e) {
-    return e.date.slice(0, 7) === prefix;
+    const d = new Date(e.date);
+    if (range.start && d < range.start) return false;
+    if (range.end && d >= range.end) return false;
+    return true;
   });
 }
 
-function renderMonthView() {
-  const now = new Date();
-  const displayMonth = activeMonth !== null ? activeMonth : now.getMonth();
-  const displayYear = activeYear !== null ? activeYear : now.getFullYear();
+function renderPeriodView() {
+  const range = getPeriodRange();
+  periodLabel.textContent = range.label;
 
-  monthName.textContent = MONTHS[displayMonth];
-  monthYear.textContent = displayYear;
+  const list = getExpensesInPeriod();
+  const total = list.reduce(function (sum, e) { return sum + Number(e.amount); }, 0);
+  periodTotalAmount.textContent = formatCurrency(total);
 
-  const total = getMonthTotal(displayMonth, displayYear);
-
-  if (activeMonth === null) {
-    monthBadge.textContent = 'all months';
-    monthTotalAmount.textContent = formatCurrency(
-      expenses.reduce(function (sum, e) { return sum + Number(e.amount); }, 0)
-    );
-    monthToday.classList.remove('active');
+  if (activePeriod === 'all') {
+    periodBadge.textContent = expenses.length + ' expenses';
+    periodTotalLabel.textContent = 'Total (All Time)';
   } else {
-    const m = String(displayMonth + 1).padStart(2, '0');
-    monthBadge.textContent = displayYear + '-' + m;
-    monthTotalAmount.textContent = formatCurrency(total);
-    monthToday.classList.add('active');
+    periodBadge.textContent = list.length + ' expenses';
+    periodTotalLabel.textContent = 'Total for ' + range.label;
   }
+
+  periodNav.style.display = (activePeriod === 'all' || activePeriod === 'custom') ? 'none' : 'flex';
+  periodCustom.style.display = activePeriod === 'custom' ? 'block' : 'none';
+  periodToday.classList.toggle('active', activePeriod !== 'all');
+
+  document.querySelectorAll('.period-tab').forEach(function (tab) {
+    tab.classList.toggle('active', tab.getAttribute('data-period') === activePeriod);
+  });
 }
 
 function getFilteredExpenses() {
@@ -148,9 +208,10 @@ function getFilteredExpenses() {
     });
   }
 
-  if (activeMonth !== null && activeYear !== null) {
-    filtered = getMonthExpenses(activeMonth, activeYear).filter(function (e) {
-      return filtered.indexOf(e) !== -1;
+  if (activePeriod !== 'all') {
+    const periodExpenses = getExpensesInPeriod();
+    filtered = filtered.filter(function (e) {
+      return periodExpenses.indexOf(e) !== -1;
     });
   }
 
@@ -315,7 +376,7 @@ function closeEditModal() {
 
 function saveAndRefresh() {
   saveExpenses();
-  renderMonthView();
+  renderPeriodView();
   renderExpensesList();
   updateTotal();
   updateCount();
@@ -426,37 +487,58 @@ exportBtn.addEventListener('click', function () {
   URL.revokeObjectURL(link.href);
 });
 
-monthPrev.addEventListener('click', function () {
-  var now = new Date();
-  var m = activeMonth !== null ? activeMonth : now.getMonth();
-  var y = activeYear !== null ? activeYear : now.getFullYear();
-  m--;
-  if (m < 0) {
-    m = 11;
-    y--;
+periodPrev.addEventListener('click', function () {
+  const d = new Date(activeDate);
+  switch (activePeriod) {
+    case 'week': d.setDate(d.getDate() - 7); break;
+    case 'month': d.setMonth(d.getMonth() - 1); break;
+    case 'quarter': d.setMonth(d.getMonth() - 3); break;
+    case 'year': d.setFullYear(d.getFullYear() - 1); break;
   }
-  activeMonth = m;
-  activeYear = y;
+  activeDate = d;
   saveAndRefresh();
 });
 
-monthNext.addEventListener('click', function () {
-  var now = new Date();
-  var m = activeMonth !== null ? activeMonth : now.getMonth();
-  var y = activeYear !== null ? activeYear : now.getFullYear();
-  m++;
-  if (m > 11) {
-    m = 0;
-    y++;
+periodNext.addEventListener('click', function () {
+  const d = new Date(activeDate);
+  switch (activePeriod) {
+    case 'week': d.setDate(d.getDate() + 7); break;
+    case 'month': d.setMonth(d.getMonth() + 1); break;
+    case 'quarter': d.setMonth(d.getMonth() + 3); break;
+    case 'year': d.setFullYear(d.getFullYear() + 1); break;
   }
-  activeMonth = m;
-  activeYear = y;
+  activeDate = d;
   saveAndRefresh();
 });
 
-monthToday.addEventListener('click', function () {
-  activeMonth = null;
-  activeYear = null;
+periodToday.addEventListener('click', function () {
+  activeDate = new Date();
+  saveAndRefresh();
+});
+
+periodTabs.addEventListener('click', function (e) {
+  const tab = e.target.closest('.period-tab');
+  if (!tab) return;
+  const period = tab.getAttribute('data-period');
+  activePeriod = period;
+  activeDate = new Date();
+  if (period === 'custom') {
+    const today = new Date();
+    customStart = today.toISOString().slice(0, 10);
+    customEnd = today.toISOString().slice(0, 10);
+    periodStart.value = customStart;
+    periodEnd.value = customEnd;
+  }
+  saveAndRefresh();
+});
+
+periodStart.addEventListener('change', function () {
+  customStart = this.value;
+  saveAndRefresh();
+});
+
+periodEnd.addEventListener('change', function () {
+  customEnd = this.value;
   saveAndRefresh();
 });
 

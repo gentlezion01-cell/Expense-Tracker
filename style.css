@@ -589,6 +589,48 @@ body {
   border: 1px solid #1e1e3f;
 }
 
+.period-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 14px;
+  justify-content: center;
+}
+
+.period-tab {
+  padding: 5px 12px;
+  background: #0d0d22;
+  border: 1px solid #1e1e3f;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.period-tab:hover {
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+.period-tab.active {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #c4b5fd;
+}
+
+.period-custom {
+  margin-bottom: 14px;
+}
+
+.period-custom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
 .modal-overlay {
   display: none;
   position: fixed;
@@ -1010,6 +1052,15 @@ body {
     font-size: 12px;
   }
 
+  .period-tab {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  .period-custom-row {
+    grid-template-columns: 1fr;
+  }
+
   .month-nav {
     gap: 6px;
   }
@@ -1087,7 +1138,8 @@ body {
   .cancel-btn:hover,
   .save-btn:hover,
   .filter-chip:hover,
-  .category-chip:hover {
+  .category-chip:hover,
+  .period-tab:hover {
     opacity: 1;
     background: inherit;
     border-color: inherit;
@@ -1102,7 +1154,8 @@ body {
     opacity: 0.8;
   }
 
-  .filter-chip:active {
+  .filter-chip:active,
+  .period-tab:active {
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));
     border-color: rgba(139, 92, 246, 0.4);
     color: #c4b5fd;
