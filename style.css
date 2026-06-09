@@ -488,6 +488,107 @@ body {
   color: #94a3b8;
 }
 
+.month-card {
+  text-align: center;
+}
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.month-btn {
+  background: #0d0d22;
+  border: 1px solid #1e1e3f;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.month-btn:hover {
+  border-color: #8b5cf6;
+  color: #c4b5fd;
+}
+
+.month-btn.month-today {
+  width: auto;
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.month-btn.month-today.active {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #c4b5fd;
+}
+
+.month-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 110px;
+}
+
+.month-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #e2e8f0;
+  text-transform: capitalize;
+}
+
+.month-year {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.month-total {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  background: #0d0d22;
+  border-radius: 10px;
+  border: 1px solid #1e1e3f;
+}
+
+.month-total-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.month-total-amount {
+  font-size: 22px;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.month-badge {
+  font-size: 11px;
+  font-weight: 500;
+  color: #475569;
+  padding: 2px 8px;
+  background: #111128;
+  border-radius: 6px;
+  border: 1px solid #1e1e3f;
+}
+
 .modal-overlay {
   display: none;
   position: fixed;

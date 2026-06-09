@@ -1,3 +1,5 @@
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
 const CATEGORY_COLOURS = {
   'Food & Drinks': '#f59e0b',
   'Transport': '#3b82f6',
@@ -29,10 +31,19 @@ const editName = document.getElementById('edit-name');
 const editAmount = document.getElementById('edit-amount');
 const editCategory = document.getElementById('edit-category');
 const cancelEdit = document.getElementById('cancel-edit');
+const monthPrev = document.getElementById('month-prev');
+const monthNext = document.getElementById('month-next');
+const monthToday = document.getElementById('month-today');
+const monthName = document.getElementById('month-name');
+const monthYear = document.getElementById('month-year');
+const monthTotalAmount = document.getElementById('month-total-amount');
+const monthBadge = document.getElementById('month-badge');
 
 let expenses = [];
 let editingIndex = null;
 let activeFilter = null;
+let activeMonth = null;
+let activeYear = null;
 
 function loadExpenses() {
   try {
@@ -81,20 +92,70 @@ function formatDate(dateStr) {
   return days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()] + ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 }
 
+function getMonthTotal(month, year) {
+  const m = String(month + 1).padStart(2, '0');
+  const prefix = year + '-' + m;
+  return expenses
+    .filter(function (e) { return e.date.slice(0, 7) === prefix; })
+    .reduce(function (sum, e) { return sum + Number(e.amount); }, 0);
+}
+
+function getMonthExpenses(month, year) {
+  const m = String(month + 1).padStart(2, '0');
+  const prefix = year + '-' + m;
+  return expenses.filter(function (e) {
+    return e.date.slice(0, 7) === prefix;
+  });
+}
+
+function renderMonthView() {
+  const now = new Date();
+  const displayMonth = activeMonth !== null ? activeMonth : now.getMonth();
+  const displayYear = activeYear !== null ? activeYear : now.getFullYear();
+
+  monthName.textContent = MONTHS[displayMonth];
+  monthYear.textContent = displayYear;
+
+  const total = getMonthTotal(displayMonth, displayYear);
+
+  if (activeMonth === null) {
+    monthBadge.textContent = 'all months';
+    monthTotalAmount.textContent = formatCurrency(
+      expenses.reduce(function (sum, e) { return sum + Number(e.amount); }, 0)
+    );
+    monthToday.classList.remove('active');
+  } else {
+    const m = String(displayMonth + 1).padStart(2, '0');
+    monthBadge.textContent = displayYear + '-' + m;
+    monthTotalAmount.textContent = formatCurrency(total);
+    monthToday.classList.add('active');
+  }
+}
+
 function getFilteredExpenses() {
   let filtered = [...expenses];
 
   const query = searchInput.value.trim().toLowerCase();
   if (query) {
-    filtered = filtered.filter(e => e.name.toLowerCase().includes(query));
+    filtered = filtered.filter(function (e) {
+      return e.name.toLowerCase().includes(query);
+    });
   }
 
   if (activeFilter) {
-    filtered = filtered.filter(e => e.category === activeFilter);
+    filtered = filtered.filter(function (e) {
+      return e.category === activeFilter;
+    });
+  }
+
+  if (activeMonth !== null && activeYear !== null) {
+    filtered = getMonthExpenses(activeMonth, activeYear).filter(function (e) {
+      return filtered.indexOf(e) !== -1;
+    });
   }
 
   const sort = sortSelect.value;
-  filtered.sort((a, b) => {
+  filtered.sort(function (a, b) {
     switch (sort) {
       case 'newest': return new Date(b.date) - new Date(a.date);
       case 'oldest': return new Date(a.date) - new Date(b.date);
@@ -110,7 +171,7 @@ function getFilteredExpenses() {
 }
 
 function updateTotal() {
-  const total = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
+  const total = expenses.reduce(function (sum, e) { return sum + Number(e.amount); }, 0);
   totalAmount.textContent = formatCurrency(total);
 }
 
@@ -120,111 +181,111 @@ function updateCount() {
 
 function renderCategoryBreakdown() {
   const map = {};
-  expenses.forEach(e => {
+  expenses.forEach(function (e) {
     map[e.category] = (map[e.category] || 0) + Number(e.amount);
   });
 
-  const entries = Object.entries(map).sort((a, b) => b[1] - a[1]);
+  const entries = Object.entries(map).sort(function (a, b) { return b[1] - a[1]; });
 
   if (entries.length === 0) {
     categoryBreakdown.innerHTML = '';
     return;
   }
 
-  categoryBreakdown.innerHTML = entries.map(([cat, total]) => `
-    <div class="category-chip">
-      <span class="chip-dot" style="background:${CATEGORY_COLOURS[cat] || '#64748b'}"></span>
-      <span>${cat}</span>
-      <span class="chip-amount">${formatCurrency(total)}</span>
-    </div>
-  `).join('');
+  categoryBreakdown.innerHTML = entries.map(function (_ref) {
+    var cat = _ref[0], total = _ref[1];
+    return '<div class="category-chip">\
+      <span class="chip-dot" style="background:' + (CATEGORY_COLOURS[cat] || '#64748b') + '"></span>\
+      <span>' + cat + '</span>\
+      <span class="chip-amount">' + formatCurrency(total) + '</span>\
+    </div>';
+  }).join('');
 }
 
 function renderFilterChips() {
-  const categories = [...new Set(expenses.map(e => e.category))];
-  const allActive = activeFilter === null ? 'active' : '';
+  var categories = [...new Set(expenses.map(function (e) { return e.category; }))];
+  var allActive = activeFilter === null ? 'active' : '';
 
-  filterChips.innerHTML = `<button class="filter-chip ${allActive}" data-filter="all">All</button>`;
+  filterChips.innerHTML = '<button class="filter-chip ' + allActive + '" data-filter="all">All</button>';
 
-  categories.forEach(cat => {
-    const active = activeFilter === cat ? 'active' : '';
-    filterChips.innerHTML += `<button class="filter-chip ${active}" data-filter="${cat}">${cat}</button>`;
+  categories.forEach(function (cat) {
+    var active = activeFilter === cat ? 'active' : '';
+    filterChips.innerHTML += '<button class="filter-chip ' + active + '" data-filter="' + cat + '">' + cat + '</button>';
   });
 
-  filterChips.querySelectorAll('.filter-chip').forEach(btn => {
+  filterChips.querySelectorAll('.filter-chip').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      const val = this.getAttribute('data-filter');
+      var val = this.getAttribute('data-filter');
       activeFilter = val === 'all' ? null : val;
       renderFilterChips();
-      renderExpenses();
+      renderExpensesList();
     });
   });
 }
 
-function renderExpenses() {
-  const filtered = getFilteredExpenses();
+function renderExpensesList() {
+  var list = getFilteredExpenses();
 
-  if (filtered.length === 0) {
+  if (list.length === 0) {
     expenseList.innerHTML = '<p class="empty-msg">' + (expenses.length === 0 ? 'No expenses yet. Start tracking today.' : 'No expenses match your search or filter.') + '</p>';
     return;
   }
 
   expenseList.innerHTML = '';
 
-  filtered.forEach((expense, displayIndex) => {
-    const actualIndex = expenses.indexOf(expense);
-    const item = document.createElement('div');
+  list.forEach(function (expense) {
+    var actualIndex = expenses.indexOf(expense);
+    var item = document.createElement('div');
     item.className = 'expense-item';
 
-    item.innerHTML = `
-      <div class="expense-left">
-        <div class="expense-top">
-          <span class="expense-name">${escapeHtml(expense.name)}</span>
-        </div>
-        <div class="expense-bottom">
-          <span class="expense-category-badge">
-            <span class="chip-dot" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${CATEGORY_COLOURS[expense.category] || '#64748b'};flex-shrink:0;"></span>
-            ${expense.category}
-          </span>
-          <span class="expense-date">${formatDate(expense.date)}</span>
-        </div>
-      </div>
-      <div class="expense-right">
-        <span class="expense-amount">${formatCurrency(expense.amount)}</span>
-        <button class="edit-btn" data-index="${actualIndex}" title="Edit">✎</button>
-        <button class="delete-btn" data-index="${actualIndex}" title="Remove">✕</button>
-      </div>
-    `;
+    item.innerHTML = '\
+      <div class="expense-left">\
+        <div class="expense-top">\
+          <span class="expense-name">' + escapeHtml(expense.name) + '</span>\
+        </div>\
+        <div class="expense-bottom">\
+          <span class="expense-category-badge">\
+            <span class="chip-dot" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + (CATEGORY_COLOURS[expense.category] || '#64748b') + ';flex-shrink:0;"></span>\
+            ' + expense.category + '\
+          </span>\
+          <span class="expense-date">' + formatDate(expense.date) + '</span>\
+        </div>\
+      </div>\
+      <div class="expense-right">\
+        <span class="expense-amount">' + formatCurrency(expense.amount) + '</span>\
+        <button class="edit-btn" data-index="' + actualIndex + '" title="Edit">\u270E</button>\
+        <button class="delete-btn" data-index="' + actualIndex + '" title="Remove">\u2715</button>\
+      </div>';
 
     expenseList.appendChild(item);
   });
 
-  expenseList.querySelectorAll('.edit-btn').forEach(btn => {
+  expenseList.querySelectorAll('.edit-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      const idx = parseInt(this.getAttribute('data-index'));
+      var idx = parseInt(this.getAttribute('data-index'));
       openEditModal(idx);
     });
   });
 
-  expenseList.querySelectorAll('.delete-btn').forEach(btn => {
+  expenseList.querySelectorAll('.delete-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      const idx = parseInt(this.getAttribute('data-index'));
+      var idx = parseInt(this.getAttribute('data-index'));
       removeExpense(idx);
     });
   });
 }
 
 function escapeHtml(text) {
-  const div = document.createElement('div');
+  var div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
 function addExpense(name, amount, category) {
   expenses.push({
-    name,
-    amount,
-    category,
+    name: name,
+    amount: amount,
+    category: category,
     date: new Date().toISOString()
   });
   saveAndRefresh();
@@ -238,7 +299,7 @@ function removeExpense(index) {
 }
 
 function openEditModal(index) {
-  const expense = expenses[index];
+  var expense = expenses[index];
   editingIndex = index;
   editName.value = expense.name;
   editAmount.value = expense.amount;
@@ -254,7 +315,8 @@ function closeEditModal() {
 
 function saveAndRefresh() {
   saveExpenses();
-  renderExpenses();
+  renderMonthView();
+  renderExpensesList();
   updateTotal();
   updateCount();
   renderCategoryBreakdown();
@@ -264,9 +326,9 @@ function saveAndRefresh() {
 form.addEventListener('submit', function (e) {
   e.preventDefault();
 
-  const name = nameInput.value.trim();
-  const amount = parseFloat(amountInput.value);
-  const category = categorySelect.value;
+  var name = nameInput.value.trim();
+  var amount = parseFloat(amountInput.value);
+  var category = categorySelect.value;
 
   if (!name) {
     alert('Please enter an expense name.');
@@ -291,9 +353,9 @@ form.addEventListener('submit', function (e) {
 editForm.addEventListener('submit', function (e) {
   e.preventDefault();
 
-  const name = editName.value.trim();
-  const amount = parseFloat(editAmount.value);
-  const category = editCategory.value;
+  var name = editName.value.trim();
+  var amount = parseFloat(editAmount.value);
+  var category = editCategory.value;
 
   if (!name) {
     alert('Please enter an expense name.');
@@ -332,11 +394,11 @@ document.addEventListener('keydown', function (e) {
 });
 
 searchInput.addEventListener('input', function () {
-  renderExpenses();
+  renderExpensesList();
 });
 
 sortSelect.addEventListener('change', function () {
-  renderExpenses();
+  renderExpensesList();
 });
 
 exportBtn.addEventListener('click', function () {
@@ -345,21 +407,57 @@ exportBtn.addEventListener('click', function () {
     return;
   }
 
-  const headers = ['Name', 'Amount (₦)', 'Category', 'Date'];
-  const rows = expenses.map(e => [
-    '"' + e.name.replace(/"/g, '""') + '"',
-    e.amount,
-    '"' + e.category.replace(/"/g, '""') + '"',
-    '"' + new Date(e.date).toLocaleString('en-GB') + '"'
-  ]);
+  var headers = ['Name', 'Amount (₦)', 'Category', 'Date'];
+  var rows = expenses.map(function (e) {
+    return [
+      '"' + e.name.replace(/"/g, '""') + '"',
+      e.amount,
+      '"' + e.category.replace(/"/g, '""') + '"',
+      '"' + new Date(e.date).toLocaleString('en-GB') + '"'
+    ];
+  });
 
-  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
+  var csv = [headers.join(','), ...rows.map(function (r) { return r.join(','); })].join('\n');
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
   link.download = 'kala_expenses_' + new Date().toISOString().slice(0, 10) + '.csv';
   link.click();
   URL.revokeObjectURL(link.href);
+});
+
+monthPrev.addEventListener('click', function () {
+  var now = new Date();
+  var m = activeMonth !== null ? activeMonth : now.getMonth();
+  var y = activeYear !== null ? activeYear : now.getFullYear();
+  m--;
+  if (m < 0) {
+    m = 11;
+    y--;
+  }
+  activeMonth = m;
+  activeYear = y;
+  saveAndRefresh();
+});
+
+monthNext.addEventListener('click', function () {
+  var now = new Date();
+  var m = activeMonth !== null ? activeMonth : now.getMonth();
+  var y = activeYear !== null ? activeYear : now.getFullYear();
+  m++;
+  if (m > 11) {
+    m = 0;
+    y++;
+  }
+  activeMonth = m;
+  activeYear = y;
+  saveAndRefresh();
+});
+
+monthToday.addEventListener('click', function () {
+  activeMonth = null;
+  activeYear = null;
+  saveAndRefresh();
 });
 
 loadExpenses();
