@@ -677,7 +677,279 @@ body {
   opacity: 0.9;
 }
 
+/* ─── Laptop / Desktop ─── */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 720px;
+  }
+
+  body {
+    padding: 48px 32px;
+  }
+
+  .card {
+    padding: 28px;
+    margin-bottom: 20px;
+    border-radius: 18px;
+  }
+
+  .card-title {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .form-row {
+    gap: 16px;
+  }
+
+  .form-row:first-of-type {
+    margin-bottom: 16px;
+  }
+
+  .input-group input,
+  .input-group select {
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+
+  #add-btn {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .total-amount {
+    font-size: 36px;
+  }
+
+  .expense-count {
+    font-size: 26px;
+  }
+
+  .total-right {
+    padding: 14px 24px;
+  }
+
+  .category-breakdown {
+    margin-top: 20px;
+    padding-top: 20px;
+    gap: 10px;
+  }
+
+  .category-chip {
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+
+  .expense-item {
+    padding: 16px 0;
+    gap: 16px;
+  }
+
+  .expense-name {
+    font-size: 15px;
+  }
+
+  .expense-amount {
+    font-size: 16px;
+  }
+
+  .edit-btn,
+  .delete-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+
+  .list-actions {
+    gap: 12px;
+  }
+
+  .search-box input {
+    padding: 10px 14px;
+    padding-left: 38px;
+    font-size: 14px;
+    background-position: 14px center;
+  }
+
+  .sort-box select {
+    padding: 10px 14px;
+    padding-right: 32px;
+    font-size: 14px;
+  }
+
+  .filter-chip {
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+
+  .month-name {
+    font-size: 18px;
+  }
+
+  .month-total-amount {
+    font-size: 24px;
+  }
+
+  .month-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .month-btn.month-today {
+    padding: 0 18px;
+    font-size: 13px;
+  }
+
+  .month-nav {
+    gap: 10px;
+  }
+
+  .month-total {
+    padding: 14px 20px;
+  }
+
+  .export-btn {
+    padding: 10px 22px;
+    font-size: 13px;
+  }
+
+  .list-footer {
+    margin-top: 20px;
+    padding-top: 20px;
+  }
+
+  .modal {
+    padding: 32px;
+    max-width: 480px;
+  }
+
+  .modal-title {
+    font-size: 20px;
+    margin-bottom: 24px;
+  }
+
+  .cancel-btn,
+  .save-btn {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .header {
+    margin-bottom: 36px;
+  }
+
+  .logo-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+    border-radius: 12px;
+  }
+
+  .logo h1 {
+    font-size: 30px;
+  }
+
+  .tagline {
+    font-size: 14px;
+  }
+}
+
+/* ─── Wide Desktop ─── */
+@media (min-width: 1600px) {
+  .container {
+    max-width: 860px;
+  }
+
+  body {
+    padding: 64px 40px;
+  }
+
+  .card {
+    padding: 32px;
+    margin-bottom: 24px;
+    border-radius: 20px;
+  }
+
+  .total-amount {
+    font-size: 42px;
+  }
+
+  .expense-count {
+    font-size: 30px;
+  }
+
+  .expense-item {
+    padding: 20px 0;
+  }
+
+  .expense-name {
+    font-size: 16px;
+  }
+
+  .expense-amount {
+    font-size: 18px;
+  }
+
+  .header {
+    margin-bottom: 44px;
+  }
+
+  .logo-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 22px;
+  }
+
+  .logo h1 {
+    font-size: 34px;
+  }
+}
+
+/* ─── Tablet ─── */
+@media (max-width: 768px) {
+  body {
+    padding: 24px 16px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .total-amount {
+    font-size: 26px;
+  }
+
+  .expense-count {
+    font-size: 20px;
+  }
+
+  .modal {
+    padding: 24px;
+  }
+
+  .month-total-amount {
+    font-size: 20px;
+  }
+}
+
+/* ─── Mobile ─── */
 @media (max-width: 480px) {
+  body {
+    padding: 16px 12px;
+  }
+
+  .container {
+    max-width: 100%;
+  }
+
+  .card {
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+
   .form-row {
     grid-template-columns: 1fr;
   }
@@ -710,5 +982,224 @@ body {
   .total-right {
     flex-direction: row;
     gap: 8px;
+  }
+
+  .logo h1 {
+    font-size: 22px;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .expense-item {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .expense-right {
+    justify-content: flex-end;
+  }
+
+  .edit-btn,
+  .delete-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .month-nav {
+    gap: 6px;
+  }
+
+  .month-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
+  }
+
+  .month-display {
+    min-width: 90px;
+  }
+
+  .month-name {
+    font-size: 14px;
+  }
+
+  .month-total {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .month-total-amount {
+    font-size: 18px;
+  }
+
+  .modal {
+    padding: 20px;
+    max-width: 100%;
+    border-radius: 12px;
+    margin: 10px;
+  }
+
+  .modal-title {
+    font-size: 16px;
+  }
+
+  .filter-chip {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  .category-chip {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .search-box input {
+    font-size: 12px;
+    padding: 8px 12px;
+    padding-left: 32px;
+  }
+
+  .sort-box select {
+    font-size: 12px;
+    padding: 8px 12px;
+    padding-right: 28px;
+  }
+
+  .export-btn {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+  }
+}
+
+/* ─── Touch devices: remove hover states that cause sticky taps ─── */
+@media (hover: none) and (pointer: coarse) {
+  #add-btn:hover,
+  .edit-btn:hover,
+  .delete-btn:hover,
+  .export-btn:hover,
+  .month-btn:hover,
+  .cancel-btn:hover,
+  .save-btn:hover,
+  .filter-chip:hover,
+  .category-chip:hover {
+    opacity: 1;
+    background: inherit;
+    border-color: inherit;
+    color: inherit;
+  }
+
+  #add-btn:active,
+  .edit-btn:active,
+  .delete-btn:active,
+  .month-btn:active,
+  .save-btn:active {
+    opacity: 0.8;
+  }
+
+  .filter-chip:active {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));
+    border-color: rgba(139, 92, 246, 0.4);
+    color: #c4b5fd;
+  }
+
+  .delete-btn:active {
+    color: #ef4444;
+    border-color: #ef4444;
+  }
+
+  .edit-btn:active {
+    color: #a78bfa;
+    border-color: #8b5cf6;
+  }
+
+  input,
+  select,
+  button {
+    font-size: 16px;
+  }
+}
+
+/* ─── Small Mobile ─── */
+@media (max-width: 360px) {
+  body {
+    padding: 12px 8px;
+  }
+
+  .card {
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+
+  .card-title {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+
+  .total-amount {
+    font-size: 20px;
+  }
+
+  .expense-count {
+    font-size: 16px;
+  }
+
+  .expense-name {
+    font-size: 13px;
+  }
+
+  .expense-amount {
+    font-size: 13px;
+  }
+
+  .month-name {
+    font-size: 13px;
+  }
+
+  .month-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+
+  .month-btn.month-today {
+    padding: 0 10px;
+    font-size: 11px;
+  }
+
+  .month-display {
+    min-width: 70px;
+  }
+
+  .tagline {
+    font-size: 12px;
+  }
+
+  .modal {
+    padding: 16px;
+    margin: 6px;
+  }
+
+  .cancel-btn,
+  .save-btn {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .input-group input,
+  .input-group select {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  #add-btn {
+    padding: 8px;
+    font-size: 13px;
   }
 }
