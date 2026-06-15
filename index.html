@@ -1484,6 +1484,7 @@ body {
       <h2 class="card-title">Period View</h2>
       <div class="period-tabs" id="period-tabs">
         <button class="period-tab active" data-period="month">Month</button>
+        <button class="period-tab" data-period="today">Today</button>
         <button class="period-tab" data-period="week">Week</button>
         <button class="period-tab" data-period="quarter">Quarter</button>
         <button class="period-tab" data-period="year">Year</button>
@@ -1686,6 +1687,14 @@ function getPeriodRange() {
   let start, end, label;
 
   switch (activePeriod) {
+    case 'today': {
+      start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      start.setHours(0, 0, 0, 0);
+      end = new Date(start);
+      end.setDate(end.getDate() + 1);
+      label = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      break;
+    }
     case 'week': {
       const day = d.getDay();
       const diff = d.getDate() - day + (day === 0 ? -6 : 1);
@@ -2072,6 +2081,7 @@ exportBtn.addEventListener('click', function () {
 periodPrev.addEventListener('click', function () {
   const d = new Date(activeDate);
   switch (activePeriod) {
+    case 'today': d.setDate(d.getDate() - 1); break;
     case 'week': d.setDate(d.getDate() - 7); break;
     case 'month': d.setMonth(d.getMonth() - 1); break;
     case 'quarter': d.setMonth(d.getMonth() - 3); break;
@@ -2084,6 +2094,7 @@ periodPrev.addEventListener('click', function () {
 periodNext.addEventListener('click', function () {
   const d = new Date(activeDate);
   switch (activePeriod) {
+    case 'today': d.setDate(d.getDate() + 1); break;
     case 'week': d.setDate(d.getDate() + 7); break;
     case 'month': d.setMonth(d.getMonth() + 1); break;
     case 'quarter': d.setMonth(d.getMonth() + 3); break;
