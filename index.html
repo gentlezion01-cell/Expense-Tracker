@@ -65,12 +65,12 @@
   --accent-red: #dc2626;
 }
 
-[data-font-size="small"] {
-  --scale: 0.9;
+[data-font-size="small"] .container {
+  zoom: 0.85;
 }
 
-[data-font-size="large"] {
-  --scale: 1.1;
+[data-font-size="large"] .container {
+  zoom: 1.15;
 }
 
 [data-contrast="high"] {
@@ -101,7 +101,7 @@ body {
   justify-content: center;
   align-items: flex-start;
   color: var(--text-primary);
-  font-size: calc(14px * var(--scale, 1));
+  font-size: 14px;
 }
 
 .container {
